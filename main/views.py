@@ -18,9 +18,10 @@ from . import models
 # Create your views here.
 @csrf_exempt
 @api_view(['POST'])
-def home(request):
+def createOrUpdate(request):
     profile, created = models.Profile.objects.get_or_create(employee_id=request.POST['employee_id'])
     
+    profile.owner = request.POST['terminal']
     profile.admin=request.POST['admin']
     profile.active=request.POST['active']
     profile.last_name=request.POST['last_name']
@@ -37,20 +38,18 @@ def home(request):
     profile.save()
     return HttpResponse(profile.id)
 
-
+@api_view(['GET'])
 def sync(request):
     if request.method == 'GET':
-        terminal, created = models.Terminal.objects.get_or_create(name=request.GET['terminal'])
-        profiles = models.Profile.objects.all()
-        if not created:
-            profiles = profiles.filter(date_modified__gte=terminal.last_synced).exclude(owner=terminal)
+        # terminal, created = models.Terminal.objects.get_or_create(name=request.GET['terminal'])
+        profiles = models.Profile.objects.filter(date_modified__gte=request.GET['last_synced']).exclude(owner=request.GET['terminal'])
 
-        serializer = serializers.profile(profiles,many=True)
-        terminal.save()
+        serializer = serializers.Profile(profiles, many=True)
+        # terminal.save()
 
         return Response(serializer.data)
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Profile.objects.all()
-    serializer_class = serializers.profile
+    serializer_class = serializers.Profile

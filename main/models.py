@@ -1,8 +1,8 @@
 from django.db import models
 
-class Terminal(models.Model):
-    name = models.CharField(max_length=50)
-    last_synced = models.DateTimeField(auto_now=True)
+# class Terminal(models.Model):
+#     name = models.CharField(max_length=50)
+#     last_synced = models.DateTimeField(auto_now=True)
 
 class Profile(models.Model):
     employee_id = models.CharField(max_length=4,blank=True, unique=True)
@@ -22,4 +22,4 @@ class Profile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-    owner = models.ForeignKey(Terminal, on_delete=models.CASCADE,null=True)
+    owner = models.CharField(max_length=50,blank=True, null=True)
