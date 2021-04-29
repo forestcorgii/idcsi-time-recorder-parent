@@ -4,14 +4,16 @@ from django.db import models
 #     name = models.CharField(max_length=50)
 #     last_synced = models.DateTimeField(auto_now=True)
 
+
 class Profile(models.Model):
-    employee_id = models.CharField(max_length=4,blank=True, unique=True)
-    first_name = models.CharField(max_length=50,blank=True)
-    last_name = models.CharField(max_length=50,blank=True)
-    middle_name = models.CharField(max_length=50, blank=True)
-    department = models.CharField(max_length=75,blank=True)
-    company = models.CharField(max_length=75,blank=True)
-    schedule = models.CharField(max_length=5,blank=True)
+    employee_id = models.CharField(max_length=4, blank=True, unique=True)
+    first_name = models.CharField(max_length=50, default='')
+    last_name = models.CharField(max_length=50, default='')
+    middle_name = models.CharField(max_length=50, default='')
+    department = models.CharField(max_length=75, default='')
+    project = models.CharField(max_length=75, default='')
+    company = models.CharField(max_length=75, default='')
+    schedule = models.CharField(max_length=5, default='')
     active = models.BooleanField(default=True)
     admin = models.BooleanField(default=True)
 
@@ -22,4 +24,4 @@ class Profile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-    owner = models.CharField(max_length=50,blank=True, null=True)
+    owner = models.CharField(max_length=50, blank=True, null=True)

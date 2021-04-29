@@ -13,41 +13,63 @@ from rest_framework import generics
 from . import serializers
 from . import models
 
+import json
+
+
+# methods
+def createOrUpdateUser(userDetail, terminal):
+    profile, created = models.Profile.objects.get_or_create(
+        employee_id=userDetail['employee_id'])
+
+    profile.owner = terminal
+    profile.admin = userDetail['admin']
+    profile.active = userDetail['active']
+    profile.last_name = userDetail['last_name']
+    profile.first_name = userDetail['first_name']
+    profile.middle_name = userDetail['middle_name']
+    profile.department = userDetail['department']
+    profile.company = userDetail['company']
+    profile.schedule = userDetail['schedule']
+
+    profile.face_data1 = bytes(
+        map(int, userDetail['face_data1_string'].split(' ')))
+    profile.face_data2 = bytes(
+        map(int, userDetail['face_data2_string'].split(' ')))
+    profile.face_data3 = bytes(
+        map(int, userDetail['face_data3_string'].split(' ')))
+
+    profile.save()
+    return profile.id
 
 
 # Create your views here.
 @csrf_exempt
 @api_view(['POST'])
-def createOrUpdate(request):
-    profile, created = models.Profile.objects.get_or_create(employee_id=request.POST['employee_id'])
-    
-    profile.owner = request.POST['terminal']
-    profile.admin=request.POST['admin']
-    profile.active=request.POST['active']
-    profile.last_name=request.POST['last_name']
-    profile.first_name=request.POST['first_name']
-    profile.middle_name=request.POST['middle_name']
-    profile.department=request.POST['department']
-    profile.company=request.POST['company']
-    profile.schedule=request.POST['schedule']
+def user(request):
+    id = createOrUpdateUser(request.POST)
+    return HttpResponse(id)
 
-    profile.face_data1 = bytes(map(int,request.POST['face_data1'].split(' ')))
-    profile.face_data2 = bytes(map(int,request.POST['face_data2'].split(' ')))
-    profile.face_data3 = bytes(map(int,request.POST['face_data3'].split(' ')))
 
-    profile.save()
-    return HttpResponse(profile.id)
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def sync(request):
     if request.method == 'GET':
-        # terminal, created = models.Terminal.objects.get_or_create(name=request.GET['terminal'])
-        profiles = models.Profile.objects.filter(date_modified__gte=request.GET['last_synced']).exclude(owner=request.GET['terminal'])
+        last_synced = request.GET['last_synced']
+
+        if last_synced == '0001-01-01T00:00:00':
+            profiles = models.Profile.objects.all()
+        else:
+            profiles = models.Profile.objects.filter(
+                date_modified__gte=last_synced)
+
+        profiles = profiles.exclude(owner=request.GET['terminal'])
 
         serializer = serializers.Profile(profiles, many=True)
-        # terminal.save()
-
         return Response(serializer.data)
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        for user in data['users']:
+            createOrUpdateUser(user, data['terminal'])
+        return Response("")
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
