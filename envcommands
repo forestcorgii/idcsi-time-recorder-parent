@@ -1,0 +1,3 @@
+setx SECRET_KEY "7ssdopk@edybj1l+$boa2s)0qgnu(ou14%f#o!awlq4lk15t+v"
+setx TIME_RECORDER_PARENT_DEBUG "True"
+setx TIME_RECORDER_PARENT_DB_URL "mysql://root:root@127.0.0.1:3306/time_recorder"

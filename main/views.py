@@ -6,7 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
 
@@ -43,35 +45,42 @@ def createOrUpdateUser(userDetail, terminal):
 
 
 # Create your views here.
-@csrf_exempt
 @api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def user(request):
     id = createOrUpdateUser(request.POST)
     return HttpResponse(id)
 
 
 @api_view(['GET', 'POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def sync(request):
-    if request.method == 'GET':
-        last_synced = request.GET['last_synced']
+    if request.auth:
+        if request.method == 'GET':
+            last_synced = request.GET['last_synced']
 
-        if last_synced == '0001-01-01T00:00:00':
-            profiles = models.Profile.objects.all()
-        else:
-            profiles = models.Profile.objects.filter(
-                date_modified__gte=last_synced)
+            if last_synced == '0001-01-01T00:00:00':
+                profiles = models.Profile.objects.all()
+            else:
+                profiles = models.Profile.objects.filter(
+                    date_modified__gte=last_synced)
 
-        profiles = profiles.exclude(owner=request.GET['terminal'])
+            profiles = profiles.exclude(owner=request.GET['terminal'])
 
-        serializer = serializers.Profile(profiles, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        data = json.loads(request.body)
-        for user in data['users']:
-            createOrUpdateUser(user, data['terminal'])
-        return Response("")
+            serializer = serializers.Profile(profiles, many=True)
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            data = json.loads(request.body)
+            for user in data['users']:
+                createOrUpdateUser(user, data['terminal'])
+            return Response("")
+    return HttpResponse(request.auth)
 
-
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Profile.objects.all()
     serializer_class = serializers.Profile
