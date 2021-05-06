@@ -75,7 +75,7 @@ def sync(request):
             data = json.loads(request.body)
             for user in data['users']:
                 createOrUpdateUser(user, data['terminal'])
-            return Response("")
+            return Response("sync success")
     return HttpResponse(request.auth)
 
 @api_view(['GET', 'PUT', 'DELETE'])

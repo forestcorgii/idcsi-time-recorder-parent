@@ -25,3 +25,6 @@ class Profile(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
     owner = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return self.employee_id
