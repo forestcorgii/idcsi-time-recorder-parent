@@ -1,10 +1,11 @@
 from pathlib import Path
 
+import os
 
 import environ
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    TIME_RECORDER_PARENT_DEBUG=(bool, False)
 )
 
 
@@ -126,6 +127,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100000000
