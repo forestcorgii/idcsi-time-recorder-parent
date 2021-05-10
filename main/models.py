@@ -1,9 +1,5 @@
 from django.db import models
 
-# class Terminal(models.Model):
-#     name = models.CharField(max_length=50)
-#     last_synced = models.DateTimeField(auto_now=True)
-
 
 class Profile(models.Model):
     employee_id = models.CharField(max_length=4, blank=True, unique=True)
@@ -11,7 +7,7 @@ class Profile(models.Model):
     last_name = models.CharField(max_length=50, default='')
     middle_name = models.CharField(max_length=50, default='')
     department = models.CharField(max_length=75, default='')
-    project = models.CharField(max_length=75, default='')
+    project = models.CharField(max_length=75, blank=True, default='')
     company = models.CharField(max_length=75, default='')
     schedule = models.CharField(max_length=5, default='')
     active = models.BooleanField(default=True)
