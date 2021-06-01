@@ -12,6 +12,7 @@ class Profile(models.Model):
     schedule = models.CharField(max_length=5, default='')
     active = models.BooleanField(default=True)
     admin = models.BooleanField(default=True)
+    site = models.CharField(max_length=8)
 
     face_data1 = models.BinaryField()
     face_data2 = models.BinaryField()

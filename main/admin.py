@@ -13,11 +13,11 @@ class ProfileAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('employee_id',)}),
         ('Personal info', {'fields': ('last_name', 'first_name', 'middle_name')}),
-        ('Company Information', {'fields': ('company', 'department', 'project', 'schedule', 'active', 'admin')}),
+        ('Company Information', {'fields': ('site', 'company', 'department', 'project', 'schedule', 'active', 'admin')}),
     )
 
     search_fields = ('employee_id', 'first_name', 'last_name', 'department')
     ordering = ('employee_id',)
-    list_filter = ('company', 'active', 'admin', 'department',)
+    list_filter = ('site', 'company', 'active', 'admin', 'department',)
     
 admin.site.register(Profile, ProfileAdmin)

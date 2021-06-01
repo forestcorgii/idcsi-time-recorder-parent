@@ -19,10 +19,11 @@ import json
 
 
 # methods
-def createOrUpdateUser(userDetail, terminal):
+def createOrUpdateUser(userDetail, terminal, site):
     profile, created = models.Profile.objects.get_or_create(
         employee_id=userDetail['employee_id'])
 
+    profile.site = site
     profile.owner = terminal
     profile.admin = userDetail['admin']
     profile.active = userDetail['active']
@@ -66,15 +67,15 @@ def sync(request):
             else:
                 profiles = models.Profile.objects.filter(
                     date_modified__gte=last_synced)
-
-            profiles = profiles.exclude(owner=request.GET['terminal'])
+           
+            profiles = profiles.filter(site=request.GET['site']).exclude(owner=request.GET['terminal'])
 
             serializer = serializers.Profile(profiles, many=True)
             return Response(serializer.data)
         elif request.method == 'POST':
             data = json.loads(request.body)
             for user in data['users']:
-                createOrUpdateUser(user, data['terminal'])
+                createOrUpdateUser(user, data['terminal'],data['site'])
             return Response("sync success")
     return HttpResponse(request.auth)
 
